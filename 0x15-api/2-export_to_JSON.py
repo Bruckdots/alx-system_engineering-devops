@@ -1,33 +1,21 @@
 #!/usr/bin/python3
-'''
-export to JSON
-'''
+"""
+export to json
+"""
 
 import json
 import requests
 from sys import argv
 
-
-def getData(id):
-    '''get data  adn export of employee'''
-    URL = 'https://jsonplaceholder.typicode.com/'
-    ENDPOINT = URL + 'users/{}'.format(id)
-    employee = requests.get(ENDPOINT).json()
-    TASKENDPOINT = URL + 'todos?userId={}'.format(employee['id'])
-    tasks = requests.get(TASKENDPOINT).json()
-    data = {"employee": employee, "tasks": tasks}
-    _id = data['employee']['id']
-    _allData = []
-    for task in data['tasks']:
-        employee = {}
-        employee['task'] = task['title']
-        employee['completed'] = task['completed']
-        employee['username'] = data['employee']['username']
-        _allData.append(employee)
-    _final = {_id: _allData}
-    with open('{}.json'.format(_id), 'w') as f:
-        json.dump(_final, f)
-
-
 if __name__ == '__main__':
-    getData(argv[1])
+    endpoint = "https://jsonplaceholder.typicode.com/"
+    userId = argv[1]
+    user = requests.get(endpoint + "users/{}".
+                        format(userId), verify=False).json()
+    todo = requests.get(endpoint + "todos?userId={}".
+                        format(userId), verify=False).json()
+    with open("{}.json".format(userId), "w") as json_file:
+        json.dump({userId: [{
+            "task": task.get("title"),
+            "completed": task.get("completed"),
+            "username": user.get("username")} for task in todo]}, json_file)

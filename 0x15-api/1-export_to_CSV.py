@@ -1,30 +1,22 @@
 #!/usr/bin/python3
-'''
-export to CSV
-'''
+"""
+extend your Python script to export data in the CSV format
+"""
 
 import csv
 import requests
 from sys import argv
 
-
-def getData(id):
-    '''get data  adn export of employee'''
-    URL = 'https://jsonplaceholder.typicode.com/'
-    ENDPOINT = URL + 'users/{}'.format(id)
-    employee = requests.get(ENDPOINT).json()
-    TASKENDPOINT = URL + 'todos?userId={}'.format(employee['id'])
-    tasks = requests.get(TASKENDPOINT).json()
-    data = {"employee": employee, "tasks": tasks}
-    with open('{}.csv'.format(argv[1]), 'w') as f:
-        w = csv.writer(f, quoting=csv.QUOTE_ALL)
-        _username = data['employee']['username']
-        _id = data['employee']['id']
-        for task in data['tasks']:
-            w.writerow([_id, _username, task['completed'],
-                        task['title']
-                        ])
-
-
 if __name__ == '__main__':
-    getData(argv[1])
+    endpoint = "https://jsonplaceholder.typicode.com/"
+    userId = argv[1]
+    user = requests.get(endpoint + "users/{}".
+                        format(userId), verify=False).json()
+    todo = requests.get(endpoint + "todos?userId={}".
+                        format(userId), verify=False).json()
+    with open("{}.csv".format(userId), 'w', newline='') as csvfile:
+        my_writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+        for task in todo:
+            my_writer.writerow([int(userId), user.get('username'),
+                                task.get('completed'),
+                                task.get('title')])
